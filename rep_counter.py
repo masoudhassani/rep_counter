@@ -3,6 +3,21 @@ from scipy.signal import find_peaks
 import numpy as np
 
 class RepCounter:
+    '''repetition counter class to count the number of cycle counts on a 1D signal
+
+    Args:
+        max_buffer_size: maximum size of the buffer before it resets automatically (not implemented yet)
+        min_buffer_size: minimum size of buffer to start finding the peaks in the signal 
+        distance: option for scipy find_peaks function. minimum distance between two peaks 
+        filter_constant: constant for the filter applied to the buffer signal
+        use_filter: if true, filter is used otherwise raw data will be used
+
+    count(x):
+        return the number of cycles detected in the incoming signal so far
+
+    reset():
+        resets the buffer and number of reps 
+    '''    
     def __init__(self, max_buffer_size=1000, min_buffer_size=20, distance=10, filter_constant=10, use_filter=True):
         self.distance = distance
         self.max_buffer_size = max_buffer_size
