@@ -54,11 +54,16 @@ class RepCounter:
             return self.rep_count 
         
         else:
-            if self.use_filter:
-                self.buffer_filtered = self.loess1d(self.buffer, self.filter_constant)
-                peaks = find_peaks(self.buffer_filtered, distance=self.distance)
+            # do the peak counting every n-th frame. here n=10
+            if self.frame_count % int(self.distance/2) == 0:
+                if self.use_filter:
+                    self.buffer_filtered = self.loess1d(self.buffer, self.filter_constant)
+                    peaks = find_peaks(self.buffer_filtered, distance=self.distance)
+                else:
+                    peaks = find_peaks(self.buffer, distance=self.distance)
+            
             else:
-                peaks = find_peaks(self.buffer, distance=self.distance)
+                return self.rep_count 
         
         self.rep_count = len(peaks[0])
         return self.rep_count
