@@ -9,6 +9,7 @@ class RepCounter:
         max_buffer_size: maximum size of the buffer before it resets automatically (not implemented yet)
         min_buffer_size: minimum size of buffer to start finding the peaks in the signal 
         distance: option for scipy find_peaks function. minimum distance between two peaks 
+        prominence: option for scipy find_peaks function. minimum vertical distance to neighbours to be considered as peak
         filter_constant: constant for the filter applied to the buffer signal
         use_filter: if true, filter is used otherwise raw data will be used
 
@@ -18,10 +19,12 @@ class RepCounter:
     reset():
         resets the buffer and number of reps 
     '''    
-    def __init__(self, max_buffer_size=1000, min_buffer_size=20, distance=10, filter_constant=10, use_filter=True):
+    def __init__(self, max_buffer_size=1000, min_buffer_size=20, 
+        distance=10, prominence=0.0, filter_constant=10, use_filter=True):
         self.distance = distance
         self.max_buffer_size = max_buffer_size
         self.min_buffer_size = min_buffer_size
+        self.prominence = prominence
 
         self.use_filter = use_filter
         if use_filter:
@@ -54,13 +57,13 @@ class RepCounter:
             return self.rep_count 
         
         else:
-            # do the peak counting every n-th frame. here n=10
+            # do the peak counting every n-th frame. here n=self.distance/2
             if self.frame_count % int(self.distance/2) == 0:
                 if self.use_filter:
                     self.buffer_filtered = self.loess1d(self.buffer, self.filter_constant)
-                    peaks = find_peaks(self.buffer_filtered, distance=self.distance)
+                    peaks = find_peaks(self.buffer_filtered, distance=self.distance, prominence=self.prominence)
                 else:
-                    peaks = find_peaks(self.buffer, distance=self.distance)
+                    peaks = find_peaks(self.buffer, distance=self.distance, prominence=self.prominence)
             
             else:
                 return self.rep_count 
